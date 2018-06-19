@@ -1,0 +1,14 @@
+#!/usr/local/bin/ruby -w
+
+require "csv"
+
+require_relative 'log_parser'
+
+Dir['./logfiles/**.tsv'].sort.each do |fname|
+  parsed_log = Log_File_Parser.new(fname).segment_on(:message, 'path', /GET path="(?<path>.*?)"/).count_items_by(:ip, '80.192.113.46')
+  CSV.open("counts.csv", 'a+') do |csv|
+    parsed_log.write_headers_for csv
+    parsed_log.write_to csv
+  end
+end
+
